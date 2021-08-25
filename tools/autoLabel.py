@@ -133,16 +133,16 @@ def generalData(root=None,jsonData=None, type='Circle'):
                 if index == 0:
                     point = jsonData[str(len(text))]
                     point = clockwise(point)
-                    if point!=None:
-                        index += 1
-                        test(point,index)
+#                     if point!=None:
+#                         index += 1
+#                         test(point,index)
                     labelRes.append({"transcription":text,"points":point})
                 else:
                     point = jsonData[typeDict[len(text)]]
                     point = clockwise(point)
-                    if point!=None:
-                        index += 1
-                        test(point,index)
+#                     if point!=None:
+#                         index += 1
+#                         test(point,index)
 
                     labelRes.append({"transcription": text, "points": point})
             f.write(f"image/{texts[0]}_{type}.png\t{labelRes}\n")
