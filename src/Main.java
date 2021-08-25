@@ -15,240 +15,161 @@ public class Main {
 
 public static void main(String[] args) throws Exception {
     String root = ".";
-    // 存放所有文本信息
-//    String filepath =".\\tools\\publicinfo.csv";
-
-    // 遍历所有公司名称
-    for(String company:getListFromFile(filepath)){
-//        String type = "Oval"; // 需要根据这个修改的 Circle Oval,Person
-        // 生成指定类型的印章
-        for(String type:new ArrayList<String>(){{
-            add("Circle");//圆形章
-            add("Oval");//椭圆章
+    // 生成指定类型的印章
+    for(String type:new ArrayList<String>(){{
+        add("Circle");//圆形章
+        add("Oval");//椭圆章
 //            add("Person");//方形私人章
-        }}){
+    }}){
+        String filepath = new String();
         if(type=="Person"){
-            String filepath =".\\tools\\privateInfo.csv";
+            // 存放所有文本信息
+            filepath =".\\tools\\privateInfo.csv";
         }else {
-            String filepath =".\\tools\\publicInfo.csv";
+            filepath =".\\tools\\publicInfo.csv";
         }
+        // 遍历所有公司名称
+        for(String company:getListFromFile(filepath)){
 
-        List<String> sealType = new ArrayList<String>(){{
-            add("财务专用章");
-            add("发票品检部");
-            add("合同专用章");
-            add("名称专用章");
-            add("审定专用章");
-            add("法定代表人章");
-            add("质检专用章");
-            add("业务受理章");
-        }};
-
-        // 所有文字信息
-        HashMap<String, HashMap<String, String>> confInfo = new HashMap<String, HashMap<String, String>>(){{
-            List<Boolean> hidden = new ArrayList<Boolean>(){{
-                if(type=="Circle"){
-                    add(true);
-                    add(true);
-                    Boolean flag = Integer.parseInt(getRandom(1))%2==0;
-                    add(flag);
-                    add(!flag);}
-                if(type=="Oval"){
-                    Boolean flag = Integer.parseInt(getRandom(1))%2==0;
-                    add(true);
-                    add(flag);
-                    add(true);
-                    add(!flag);}
+            List<String> sealType = new ArrayList<String>(){{
+                add("财务专用章");
+                add("发票品检部");
+                add("合同专用章");
+                add("名称专用章");
+                add("审定专用章");
+                add("法定代表人章");
+                add("质检专用章");
+                add("业务受理章");
             }};
-            if(hidden.get(0))   put("mainFont",new HashMap<String, String>(){{
-                String size = new String();
-                if(type=="Circle"){
-                    size = String.valueOf(new Double(
-                            0.06*Math.pow(company.length(),2)-3.39*Math.pow(company.length(),1)+68.55*Math.pow(company.length(),0)).intValue());}
-                if(type=="Oval"){
-                    size = String.valueOf(new Double(-0.52*company.length()+31.98).intValue());}
-                String space =String.valueOf(new Double(-0.52*company.length()+31.98-10));
-                put("Text",company);//company
-                put("Size",size);
-                put("Font","宋体");
-                if(type=="Circle") put("Margin","7"); if(type=="Oval") put("Margin","5");
-                put("Bold","false");
-                if(type=="Oval") put("Space",space);// 参数必须有
-            }});
-            if(hidden.get(1))   put("centerFont",new HashMap<String, String>(){{
-                put("Font","宋体");
 
-                if(type=="Circle"){
-                    put("Text","★");
-                    put("Size","50");
-                    put("Bold","true");
-                }
-                if(type=="Oval"){
-                    put("Text",getRandom(15));
-                    put("Size","23");
+            // 所有文字信息
+            HashMap<String, HashMap<String, String>> confInfo = new HashMap<String, HashMap<String, String>>(){{
+                List<Boolean> hidden = new ArrayList<Boolean>(){{
+                    if(type=="Circle"){
+                        add(true);
+                        add(true);
+                        Boolean flag = Integer.parseInt(getRandom(1))%2==0;
+                        add(flag);
+                        add(!flag);}
+                    if(type=="Oval"){
+                        Boolean flag = Integer.parseInt(getRandom(1))%2==0;
+                        add(true);
+                        add(flag);
+                        add(true);
+                        add(!flag);}
+                }};
+                if(hidden.get(0))   put("mainFont",new HashMap<String, String>(){{
+                    put("Text",company);//company
+                    String size = new String();
                     put("Bold","false");
-                    put("Margin","0");
-                    put("Space","12.0");
-                }
+                    if(type=="Circle"){
+                        size = String.valueOf(new Double(
+                                0.06*Math.pow(company.length(),2)-3.39*Math.pow(company.length(),1)+68.55*Math.pow(company.length(),0)).intValue());
+                        put("Margin","7");
 
-            }});
-            // 副标题或印章编码随机出现
-            if(hidden.get(2))   put("titleFont",new HashMap<String, String>(){{
-                put("Font","宋体");
-                put("Bold","false");
-                put("Space","10.0");
-                // 随机选取章类别
-                put("Text",sealType.get( (int) (Math.random()* sealType.size())));
+                    }
+                    if(type=="Oval"){
+                        size = String.valueOf(new Double(-0.52*company.length()+31.98).intValue());
+                        put("Margin","5");
+                        String space =String.valueOf(new Double(-0.52*company.length()+31.98-10));
+                        put("Space",space);
+                    }
+                    put("Size",size);
+                    put("Font","宋体");
+                }});
+                if(hidden.get(1))   put("centerFont",new HashMap<String, String>(){{
+                    put("Font","宋体");
 
-                if(type=="Circle"){
-                    put("Size","35");
-                    put("Margin","82");
-                }
-                if(type=="Oval"){
-                    put("Size","23");
-                    put("Margin","28");
-                }
-            }});
-            if(hidden.get(3))   put("viceFont",new HashMap<String, String>(){{
-                put("Text",getRandom(13));
-                put("Size","20");
-                put("Font","宋体");
-                put("Bold","false");
-                put("Margin","-3");
+                    if(type=="Circle"){
+                        put("Text","★");
+                        put("Size","50");
+                        put("Bold","true");
+                    }
+                    if(type=="Oval"){
+                        put("Text",getRandom(15));
+                        put("Size","23");
+                        put("Bold","false");
+                        put("Margin","0");
+                        put("Space","12.0");
+                    }
 
-                if(type=="Circle") {
-                    put("Space","16.0");
-                }
-                if(type=="Oval") {
-                    put("Space","7.0");
-                }
-            }});
-        }};
-        // 印章圆圈信息：外圈、内圈、中心圈
-        HashMap<String,List<Integer>> circleInfo = new HashMap<String,List<Integer>>(){{
-            List<Boolean> hidden = new ArrayList<Boolean>(){{
-                if(type=="Circle"){
-                    add(true);
-                    Boolean flag = Integer.parseInt(getRandom(1))%2==0;
-                    add(flag);
-                    add(false);}
-                if(type=="Oval"){
-                    add(true);
-                    add(Integer.parseInt(getRandom(1))%2==0);
-                    add(Integer.parseInt(getRandom(1))%2==0);}
+                }});
+                // 副标题或印章编码随机出现
+                if(hidden.get(2))   put("titleFont",new HashMap<String, String>(){{
+                    put("Font","宋体");
+                    put("Bold","false");
+                    put("Space","10.0");
+                    // 随机选取章类别
+                    put("Text",sealType.get( (int) (Math.random()* sealType.size())));
+
+                    if(type=="Circle"){
+                        put("Size","35");
+                        put("Margin","82");
+                    }
+                    if(type=="Oval"){
+                        put("Size","23");
+                        put("Margin","28");
+                    }
+                }});
+                if(hidden.get(3))   put("viceFont",new HashMap<String, String>(){{
+                    put("Text",getRandom(13));
+                    put("Size","20");
+                    put("Font","宋体");
+                    put("Bold","false");
+                    put("Margin","-3");
+
+                    if(type=="Circle") {
+                        put("Space","16.0");
+                    }
+                    if(type=="Oval") {
+                        put("Space","7.0");
+                    }
+                }});
             }};
-            if(type=="Oval"){
-                if(hidden.get(0)) put("BorderCircle",Arrays.asList(4,140,100));
-                if(hidden.get(1)) put("BorderInnerCircle",Arrays.asList(1,135,95));
-                if(hidden.get(2)) put("InnerCircle",Arrays.asList(2,100,60));
-            }
-            if(type=="Circle"){
-                if(hidden.get(0)) put("BorderCircle",Arrays.asList(5,140,140));
-                if(hidden.get(1)) put("BorderInnerCircle",Arrays.asList(1,135,135));
-                if(hidden.get(2)) put("InnerCircle",Arrays.asList(2,100,100));
-            }
-        }};
-        // 印章信息：大小、颜色、图片位置、标签位置、印章类型
-        HashMap<String,String> sealInfo = new HashMap<String,String>(){{
+            // 印章圆圈信息：外圈、内圈、中心圈
+            HashMap<String,List<Integer>> circleInfo = new HashMap<String,List<Integer>>(){{
+                List<Boolean> hidden = new ArrayList<Boolean>(){{
+                    if(type=="Circle"){
+                        add(true);
+                        Boolean flag = Integer.parseInt(getRandom(1))%2==0;
+                        add(flag);
+                        add(false);}
+                    if(type=="Oval"){
+                        add(true);
+                        add(Integer.parseInt(getRandom(1))%2==0);
+                        add(Integer.parseInt(getRandom(1))%2==0);}
+                }};
+                if(type=="Oval"){
+                    if(hidden.get(0)) put("BorderCircle",Arrays.asList(4,140,100));
+                    if(hidden.get(1)) put("BorderInnerCircle",Arrays.asList(1,135,95));
+                    if(hidden.get(2)) put("InnerCircle",Arrays.asList(2,100,60));
+                }
+                if(type=="Circle"){
+                    if(hidden.get(0)) put("BorderCircle",Arrays.asList(5,140,140));
+                    if(hidden.get(1)) put("BorderInnerCircle",Arrays.asList(1,135,135));
+                    if(hidden.get(2)) put("InnerCircle",Arrays.asList(2,100,100));
+                }
+            }};
+            // 印章信息：大小、颜色、图片位置、标签位置、印章类型
+            HashMap<String,String> sealInfo = new HashMap<String,String>(){{
 
-            File folder = new File(Paths.get(root, "tools",type,"image").toString());
-            if (!folder.exists() && !folder.isDirectory())  folder.mkdirs();
+                File folder = new File(Paths.get(root, "tools",type,"image").toString());
+                if (!folder.exists() && !folder.isDirectory())  folder.mkdirs();
 
-            Path pngFile = Paths.get(folder.toString(),company+"_"+type+".png");//company
-            Path labelFile = Paths.get(root, "tools",type,"SealInfo.csv");
-            put("ImgPath",pngFile.toString());      // 图片路径
-            put("ImageSize","300");                 // 图片大小
-            put("BackgroudColor","red");            // 背景颜色
-            put("LabelPath",labelFile.toString());  // 标签文件
-            put("Type",type);//Person or Public // 印章类型
-        }};
-        //生成印章
-        sealGeneral(confInfo,circleInfo,sealInfo);
+                Path pngFile = Paths.get(folder.toString(),company+"_"+type+".png");//company
+                Path labelFile = Paths.get(root, "tools",type,"SealInfo.csv");
+                put("ImgPath",pngFile.toString());      // 图片路径
+                put("ImageSize","300");                 // 图片大小
+                put("BackgroudColor","red");            // 背景颜色
+                put("LabelPath",labelFile.toString());  // 标签文件
+                put("Type",type);//Person or Public // 印章类型
+            }};
+            //生成印章
+            sealGeneral(confInfo,circleInfo,sealInfo);
         }
     }
 }
 
-//    public static void main(String[] args) throws Exception {
-//        String root = "D:\\Projects\\github\\SealUtil";
-////        存放所有文本信息
-//        String filepath ="D:\\Projects\\github\\SealUtil\\companyName.csv";
-//        List<String> companyLists = getListFromFile(filepath);
-//        // 遍历所有公司名称
-//        for(String company:getListFromFile(filepath)){
-//            // 各个位置文字信息：上、中、中下、下，每个位置：文字、字体、大小、边距、间距
-//            HashMap<String, HashMap<String, String>> confInfo = new HashMap<String, HashMap<String, String>>(){{
-//                Boolean flag =  new java.util.Random().nextBoolean() ? true : false;
-//                put("mainFont",new HashMap<String, String>(){{
-//                    String size = String.valueOf(
-//                            new Double(0.06*Math.pow(company.length(),2)
-//                                    -3.39*Math.pow(company.length(),1)
-//                                    +68.55*Math.pow(company.length(),0)).intValue());
-//                    put("Text",company);
-//                    put("Size",size);
-//                    put("Font","宋体");
-//                    put("Margin","7");
-//                    put("Bold","false");
-////                put("Space","29.0");
-//                }});
-//                put("centerFont",new HashMap<String, String>(){{
-//                    put("Text","★");
-//                    put("Size","120");
-//                    put("Font","宋体");
-////                put("Margin","10");
-//                    put("Bold","true");
-////                put("Space","10.0");
-//                }});
-//                // 副标题或印章编码随机出现
-//                if(flag) put("titleFont",new HashMap<String, String>(){{
-//                    List<String> sealType = new ArrayList<String>(){{
-//                        add("财务专用章");
-//                        add("发票品检部");
-//                        add("合同专用章");
-//                        add("名称专用章");
-//                        add("审定专用章");
-//                        add("法定代表人章");
-//                        add("质检专用章");
-//                        add("业务受理章");
-//                    }};
-//                    // 随机选取章类别
-//                    put("Text",sealType.get( (int) (Math.random()* sealType.size())));
-//                    put("Size","35");
-//                    put("Font","宋体");
-//                    put("Margin","82");
-//                    put("Bold","false");
-//                    put("Space","10.0");
-//                }});
-//                if(!flag) put("viceFont",new HashMap<String, String>(){{
-//                    // 随机生成13个数字
-//                    String numbers = getRandom(13);
-//                    put("Text",numbers);
-//                    put("Size","20");
-//                    put("Font","宋体");
-//                    put("Margin","-3");
-//                    put("Bold","false");
-//                    put("Space","16.0");
-//                }});
-//            }};
-//            // 印章圆圈信息：外圈、内圈、中心圈
-//            HashMap<String,List<Integer>> circleInfo = new HashMap<String,List<Integer>>(){{
-//                put("BorderCircle",Arrays.asList(5,140,140));
-////           put("BorderInnerCircle",Arrays.asList(1,135,135));
-////           put("InnerCircle",Arrays.asList(2,100,100));
-//            }};
-//            // 印章信息：大小、颜色、图片位置、标签位置、印章类型
-//            HashMap<String,String> sealInfo = new HashMap<String,String>(){{
-//                Path pngFile = Paths.get(root, "company",company+".png");
-//                Path labelFile = Paths.get(root, "label.csv");
-//                put("ImgPath",pngFile.toString());      // 图片路径
-//                put("ImageSize","300");                 // 图片大小
-//                put("BackgroudColor","red");            // 背景颜色
-//                put("LabelPath",labelFile.toString());  // 标签文件
-//                put("Type","Public");//Person or Public // 印章类型
-//            }};
-//            //生成印章
-//            sealGeneral(confInfo,circleInfo,sealInfo);
-//        }
-//    }
     public static void sealGeneral(HashMap<String, HashMap<String, String>> confInfo,
                                    HashMap<String,List<Integer>> circleInfo,
                                    HashMap<String,String> sealInfo) throws Exception {
