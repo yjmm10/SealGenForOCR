@@ -5,6 +5,7 @@ tools/Person
 tools/*.txt
 tools/image
 out/
+.*
 
 
 # Compiled class file
