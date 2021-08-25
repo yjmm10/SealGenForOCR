@@ -62,32 +62,36 @@
     ```
     执行结束后，得到如下目录结构
 
+    ```
     | - tools
       | - Oval
         | - image # 生成的印章图片
         | - SealInfo.csv #生成的印章信息
         | - sample # 需要标注的图片
       | - ...
+    ```
+    
+    
 
 
 2. 标注数据<br>
    
-该步骤可以采用默认的基础标注文件进行使用，步骤如下
-   
-   ```
-   将 tools 文件夹下的baseLabel_*.json分别放入*文件夹下，表示该类印章已经标注，从而可以执行后续操作
-   ```
-   
-   不采用默认标注文件，则需要用到多边形标注，采用labelme标注工具，详细标注方式见**labelme标注说明**
-   
-   ```shell
-    # 安装labelme
-    pip install labelme
-    # 打开labelme
-    labelme
-    # 打开需要标注的文件夹路径
-    # 如：打开 tools\*\sample 文件夹进行标注
-   ```
+   该步骤可以采用默认的基础标注文件进行使用，步骤如下
+      
+      ```
+      将 tools 文件夹下的baseLabel_*.json分别放入*文件夹下，表示该类印章已经标注，从而可以执行后续操作
+      ```
+      
+      不采用默认标注文件，则需要用到多边形标注，采用labelme标注工具，详细标注方式见**labelme标注说明**
+      
+      ```shell
+       # 安装labelme
+       pip install labelme
+       # 打开labelme
+       labelme
+       # 打开需要标注的文件夹路径
+       # 如：打开 tools\*\sample 文件夹进行标注
+      ```
    
 3. 再次运行 baseLabel.py 脚本，得到如下目录结构
     ```
