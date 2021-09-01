@@ -2,10 +2,12 @@
 tools/Circle
 tools/Oval
 tools/Person
+tools/traindata
 tools/*.txt
 tools/image
 out/
 .*
+*.rar
 
 
 

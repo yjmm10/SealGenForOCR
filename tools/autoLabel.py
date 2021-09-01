@@ -1,3 +1,5 @@
+# -*- coding: UTF-8 -*-
+
 import json
 import os
 import shutil
@@ -123,7 +125,7 @@ def generalData(root=None,jsonData=None, type='Circle'):
     lines = Path(root).joinpath("SealInfo.csv").read_text(encoding='utf-8').split("\n")
     resPath = Path(root).joinpath(f"label_{type}.txt")
     index = 0
-    with open(resPath, 'w') as f:
+    with open(resPath, 'w',encoding='utf-8') as f:
         for line in lines:
             labelRes = []
             if line =="":
@@ -135,7 +137,7 @@ def generalData(root=None,jsonData=None, type='Circle'):
                 if index == 0:
                     point = jsonData[str(len(text))]
                     point = np.around(np.array(point), decimals=1).tolist()
-                    point = clockwise(point)
+                    # point = clockwise(point)
 #                     if point!=None:
 #                         index += 1
 #                         plottest(point,index)
@@ -143,7 +145,7 @@ def generalData(root=None,jsonData=None, type='Circle'):
                 else:
                     point = jsonData[typeDict[len(text)]]
                     point = np.around(np.array(point), decimals=1).tolist()
-                    point = clockwise(point)
+                    # point = clockwise(point)
 #                     if point!=None:
 #                         index += 1
 #                         plottest(point,index)
@@ -152,34 +154,85 @@ def generalData(root=None,jsonData=None, type='Circle'):
             f.write(f"image/{texts[0]}_{type}.png\t{labelRes}\n")
 
 def mergefiles(root,types):
-    res = ''
-    resultDir = os.path.join(root, "label")
-    if not os.path.exists(resultDir):
-        os.makedirs(resultDir)
-    resultFile = os.path.join(root, "label.txt")
-    if os.path.exists(resultFile):
-        os.remove(resultFile)
+    # 目录结构
+    # traindata
+    #    | - train
+    #        | - label.txt
+    #        | - image
+    #        | - label
+    mode = {"train":0.8,"test":0.2}
+    for i in mode.keys():
+        moderoot = os.path.join(root, "traindata", i)
+        if not os.path.exists(moderoot):
+            os.makedirs(moderoot)
+        imgdir = os.path.join(moderoot, "image")
+        labeldir = os.path.join(moderoot, "label")
+        if not os.path.exists(imgdir):
+            os.makedirs(imgdir)
+        if not os.path.exists(labeldir):
+            os.makedirs(labeldir)
 
     for type in types:
+        cnt = 0
         typepath = os.path.join(root, type)
         if not os.path.exists(typepath):
             continue
-        folder = os.path.join(typepath,'image')
-        dst_folder = os.path.join(root, 'image')
-        copyTree(folder, dst_folder)  # 复制文件夹并覆盖
-        label = os.path.join(typepath,f"label_{type}.txt")
-        res += open(label,'r').read()
-    #  生成单个标签文件
-    with open(resultFile, "w") as f:
-        f.write(res)
-    # 一个文件对应一个标签文件
-    resLists = res.split("\n")
-    for resList in resLists:
-        if resList=="":
-            continue
-        filename = resList.split('\t')[0].split('/')[-1].replace(".png",".txt")
-        with open(os.path.join(resultDir,filename),'w') as f:
-            f.write(resList)
+        imagedir = os.path.join(typepath, 'image')
+        oldlabel = os.path.join(typepath, f"label_{type}.txt")
+        # 数据分割点
+        labelLists = open(oldlabel,'r',encoding='utf-8').read().split("\n")[:-2]
+        up = len(labelLists)*mode[i]
+        for labelList in labelLists:
+            filename = labelList.split('\t')[0].split('/')[-1]
+            oldimagepath = os.path.join(imagedir,filename)
+            if cnt < up:
+                temproot ='test'
+            else:
+                temproot = 'train'
+            newroot = os.path.join(root, "traindata", temproot)
+            newimagpath = os.path.join(newroot, 'image', filename)
+            newlabelpath = os.path.join(newroot, 'label.txt')
+            newlabeldir = os.path.join(newroot, 'label',filename.replace(".png",".txt"))
+            shutil.copy(oldimagepath,newimagpath)
+            with open(newlabeldir,'w',encoding='utf-8') as f:
+                f.write(labelList)
+            with open(newlabelpath,'a+',encoding='utf-8') as fl:
+                fl.write(labelList+"\n")
+            cnt +=1
+
+
+
+
+    #
+    #
+    # res = ''
+    # resultDir = os.path.join(root, "label")
+    # if not os.path.exists(resultDir):
+    #     os.makedirs(resultDir)
+    # resultFile = os.path.join(root, "label.txt")
+    # if os.path.exists(resultFile):
+    #     os.remove(resultFile)
+    #
+    # for type in types:
+    #     typepath = os.path.join(root, type)
+    #     if not os.path.exists(typepath):
+    #         continue
+    #     folder = os.path.join(typepath,'image')
+    #     dst_folder = os.path.join(root, 'image')
+    #     copyTree(folder, dst_folder)  # 复制文件夹并覆盖
+    #     label = os.path.join(typepath,f"label_{type}.txt")
+    #     res += open(label,'r').read()
+    # #  生成单个标签文件
+    # with open(resultFile, "w",encoding='utf-8') as f:
+    #     f.write(res)
+    # # 一个文件对应一个标签文件
+    # resLists = res.split("\n")
+    # for resList in resLists:
+    #     if resList=="":
+    #         continue
+    #     filename = resList.split('\t')[0].split('/')[-1].replace(".png",".txt")
+    #     with open(os.path.join(resultDir,filename),'w',encoding='utf-8') as f:
+    #         f.write(resList)
 
 
 def clockwise(points:list):
@@ -264,6 +317,17 @@ def main():
 
     if not (os.path.exists(os.path.join(workdir,'image')) and os.path.exists(os.path.join(workdir,'label.txt'))) :
         mergefiles(workdir,types)
+
+def spiltdata(labels):
+    # 支持文件或则列表输入
+    if os.path.exists(labels):
+        labels = open(labels,'r',encoding='utf-8').read().split('\n')
+    radio = int(len(labels)*0.8)
+    for index,label in enumerate(labels):
+        filename = label.split('\t')
+
+
+
 
 
 def test():
