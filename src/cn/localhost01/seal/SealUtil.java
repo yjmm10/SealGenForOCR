@@ -12,6 +12,9 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @Description: 印章工具类
@@ -400,9 +403,10 @@ public abstract class SealUtil {
         //4.构造字体
         Font f = new Font(font.getFontFamily(), fontStyle, fontSize);
         FontRenderContext context = g2d.getFontRenderContext();
+        // 获取文字边界
         Rectangle2D rectangle = f.getStringBounds(font.getFontText(), context);
 
-        //5.文字之间间距，默认动态调整
+        //5.文字之间间距，默认动态调整，左下到左下
         double fontSpace;
         if (font.getFontSpace() != null) {
             fontSpace = font.getFontSpace();
@@ -418,14 +422,18 @@ public abstract class SealUtil {
         int marginSize = font.getMarginSize() == null ? INIT_BEGIN : font.getMarginSize();
 
         //7.写字
+        //到底部的距离 =  外面圆 + 文字大小高度 - 边距
         double newRadius = circleRadius + rectangle.getY() - marginSize;
+        // 相对于圆心相邻两个字转过的角度
         double radianPerInterval = 2 * Math.asin(fontSpace / (2 * newRadius));
 
         double fix = 0.04;
+        // 顶部
         if (isTop) {
             fix = 0.18;
         }
         double firstAngle;
+        // 底部情况
         if (!isTop) {
             if (fontTextLen % 2 == 1) {
                 firstAngle = Math.PI + Math.PI / 2 - (fontTextLen - 1) * radianPerInterval / 2.0 - fix;
@@ -433,12 +441,17 @@ public abstract class SealUtil {
                 firstAngle = Math.PI + Math.PI / 2 - ((fontTextLen / 2.0 - 0.5) * radianPerInterval) - fix;
             }
         } else {
+            // 考虑文字个数
             if (fontTextLen % 2 == 1) {
                 firstAngle = (fontTextLen - 1) * radianPerInterval / 2.0 + Math.PI / 2 + fix;
             } else {
                 firstAngle = (fontTextLen / 2.0 - 0.5) * radianPerInterval + Math.PI / 2 + fix;
             }
         }
+        System.out.printf(font.getFontText()+"\n");
+        List<List<Double>> points = getLabel(newRadius, newRadius, 150, 150, firstAngle,firstAngle - fontTextLen * radianPerInterval,rectangle.getHeight()*0.9,20,isTop);
+//        }
+
 
         for (int i = 0; i < fontTextLen; i++) {
             double theta;
@@ -447,13 +460,11 @@ public abstract class SealUtil {
 
             if (!isTop) {
                 theta = firstAngle + i * radianPerInterval;
-                thetaX = newRadius * Math.sin(Math.PI / 2 - theta);
-                thetaY = newRadius * Math.cos(theta - Math.PI / 2);
             } else {
                 theta = firstAngle - i * radianPerInterval;
-                thetaX = newRadius * Math.sin(Math.PI / 2 - theta);
-                thetaY = newRadius * Math.cos(theta - Math.PI / 2);
             }
+            thetaX = newRadius*Math.cos(theta);
+            thetaY = newRadius*Math.sin(theta);
 
             AffineTransform transform;
             if (!isTop) {
@@ -471,7 +482,46 @@ public abstract class SealUtil {
 
         }
     }
+    private static List<List<Double>> getLabel(double a, double b, double c, double d, double left, double right,double height, int n,Boolean isTop){
+        // a,b 长短轴 c,d x,y的偏移值,left,right 左右起点的角度换算的数值(angle*pi/180),n 分割的点,isTop 朝向
+        int error_in = -5;//-2;
+        int error_out = -5;//1;
+        List<List<Double>> uppoints;
+        if (isTop){
+            uppoints = getLabelPoint(a+height, b+height, c, d, left,right,error_out,n, isTop);
+            List<List<Double>> downpoints = getLabelPoint(a, b, c, d, left,right,error_in,n, isTop);
+            Collections.reverse(downpoints);
+            uppoints.addAll(downpoints);
+        }else{
+            uppoints = getLabelPoint(a-height, b-height, c, d, left,right,error_in,n, isTop);
+            List<List<Double>> downpoints =getLabelPoint(a, b, c, d, left,right,error_out,n, isTop);
+            Collections.reverse(downpoints);
+            uppoints.addAll(downpoints);
+        }
 
+        for(List<Double> i :uppoints){
+            System.out.printf("["+ i.get(0)+","+i.get(1) +"],");
+        }
+        System.out.printf("\n");
+        return uppoints;
+    }
+
+    private static List<List<Double>> getLabelPoint(double a, double b, double c, double d, double left, double right,double error, int n, Boolean isTop){
+        // 每次点位偏移量，正负皆可
+        double theta_avg = (left - right)/(n-1);
+        List<List<Double>> points = new ArrayList<List<Double>>();
+
+        for (int i = 0 ;i<n;i++) {
+            int finalI= i;
+            int top = isTop?1:(-1);
+            List<Double> point = new ArrayList<Double>(){{
+                add((a+top*error) * Math.cos(left - top*finalI * theta_avg)+c);
+                add(-(b+top*error) * Math.sin(left - top*finalI * theta_avg)+d);
+            }};
+            points.add(point);
+        }
+        return points;
+    }
     /**
      * 绘制椭圆弧形文字
      *
@@ -520,6 +570,7 @@ public abstract class SealUtil {
         double angR = startAngle * Math.PI / 180.0;
         double lastX = radiusX * Math.cos(angR) + radiusWidth;
         double lastY = radiusY * Math.sin(angR) + radiusHeight;
+
         for (double i = startAngle + step; num < alCount; i += step) {
             angR = i * Math.PI / 180.0;
             double x = radiusX * Math.cos(angR) + radiusWidth, y = radiusY * Math.sin(angR) + radiusHeight;
@@ -531,6 +582,9 @@ public abstract class SealUtil {
             num++;
         }
         double arcPer = accArcLen / fontTextLen;
+
+        System.out.printf(font.getFontText());
+        getLabel(radiusX,radiusY,radiusWidth,radiusHeight,startAngle,startAngle + fontTextLen*arcPer,new JLabel().getFontMetrics(f).getHeight(),7,isTop);
         for (int i = 0; i < fontTextLen; i++) {
             double arcL = i * arcPer + arcPer / 2.0;
             double ang = 0.0;

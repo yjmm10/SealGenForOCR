@@ -17,7 +17,7 @@ public static void main(String[] args) throws Exception {
     String root = ".";
     // 生成指定类型的印章
     for(String type:new ArrayList<String>(){{
-        add("Circle");//圆形章
+//        add("Circle");//圆形章
         add("Oval");//椭圆章
 //            add("Person");//方形私人章
     }}){
@@ -49,9 +49,12 @@ public static void main(String[] args) throws Exception {
                         add(true);
                         add(true);
                         Boolean flag = Integer.parseInt(getRandom(1))%2==0;
-                        add(flag);
-                        add(!flag);}
-                    if(type=="Oval"){
+//                        add(flag);
+//                        add(!flag);}
+                        add(false);
+                        add(true);}
+
+                        if(type=="Oval"){
                         Boolean flag = Integer.parseInt(getRandom(1))%2==0;
                         add(true);
                         add(flag);
